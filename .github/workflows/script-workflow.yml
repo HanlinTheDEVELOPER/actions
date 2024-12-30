@@ -16,4 +16,4 @@ jobs:
             - name: Run Script
               run: |
                 chmod +x myScript.sh
-                ./myScript.sh
+                myScript.sh
