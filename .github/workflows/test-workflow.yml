@@ -1,0 +1,35 @@
+name : Test Workflow
+on : push
+
+jobs:
+    test-jobs:
+        name: Test Job
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+            
+            - name: Multiple Linux Commands
+              run: |
+                    echo "Welcome to my first github action"
+                    pwd
+                    cat README.md
+            
+            - name: Install third-parties package on runner
+              run: sudo apt install cowsay -y
+
+            - name: Using third-parties command
+              run: |
+                    cowsay -f dragon "Want Some BBQ? I will supplies fuel" >> dragon.txt
+                    sudo grep -i "BBQ" dragon.txt
+                    cat dragon.txt
+    
+    another-test-jobs:
+        name: Another Test Job
+        runs-on: ubuntu-latest
+
+        steps: 
+            - name: Echoing Random Stuff
+              run: echo "Random Stuff"
+
