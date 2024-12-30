@@ -52,9 +52,26 @@ jobs:
         steps: 
             - name: Check if build exist
               run: sudo grep -i "dragon" dragon.txt
+
+    deploy_job_3:
+        needs: test_job_2
+        name: Deployment
+        runs-on: ubuntu-latest
+        steps: 
+            - name: Running The Build
+              run: cat dragon.txt
 ```
 
+![Series Jobs Fails](/series-jobs-fails.png)
 
+As you can see in image jobs are run sequencially. If one of the preceding jobs fails, the subsequent jobs will automatically be skipped.
+Okay, we have a fail job to debug. Let's do it.
+
+> Below is the log i found by clicking on the fail job
+
+![Check Build File Exist Fails](/check-build-exist-fail.png)
+
+We clearly generate that file in build state, right? Then why does it saying `No such file or directory`. Remeber, it's said in above that `a job is associated with a runner`. What is a runner? It's a virtual machine or something like that, right? So even if those three jobs are running one after another, they are still running on each machine. 
 
 ### Steps
 - Steps, individual task or actions that make up the jobs
