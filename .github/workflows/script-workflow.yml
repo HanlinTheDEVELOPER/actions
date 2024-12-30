@@ -17,4 +17,4 @@ jobs:
               run: |
                 chmod +x myScript.sh
                 cat myScript.sh
-                myScript.sh
+                bash myScript.sh
