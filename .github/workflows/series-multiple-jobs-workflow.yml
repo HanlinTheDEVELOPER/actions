@@ -1,7 +1,6 @@
-name: Will Fail Workflow
+name: Series Multiple Jobs
 on: push
-
-jobs:
+jobs: 
     build_job_1:
         name: Build State
         runs-on: ubuntu-latest
@@ -13,6 +12,7 @@ jobs:
               run: cowsay -f dragon "I am fooking dragon.. Let's burn them all" >> dragon.txt
 
     test_job_2:
+        needs: build_job_1
         name: Testing
         runs-on: ubuntu-latest
         steps: 
@@ -20,6 +20,7 @@ jobs:
               run: sudo grep -i "dragon" dragon.txt
     
     deploy_job_3:
+        needs: test_job_2
         name: Deployment
         runs-on: ubuntu-latest
         steps: 

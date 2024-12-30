@@ -16,20 +16,50 @@
 ## Components
 
 ### Workflows
-  - name : Name of the workflow, if it's not provided relative path will show on Github Actions tab
-  - on : event and trigger like [push,folk,pr]
+- name : Name of the workflow, if it's not provided relative path will show on Github Actions tab
+- on : event and trigger like [push,folk,pr]
 
 ### Jobs 
-  - building blocks of workflows
-  - can have one or more jobs in single workflow
-  - is associated with a runner
-       - Linux, Mac or Window VM
-       - Github hosted or Self-hosted
-       -  use runs-on attr to specify runner config
+- building blocks of workflows
+- a job is associated with a runner
+  - Linux, Mac or Window VM
+  - Github hosted or Self-hosted
+  -  use runs-on attr to specify runner config
+- can have one or more jobs in single workflow
+    - Jobs in a workflow run parallelly so it will fail in case one jobs depand on others
+        > e.g Test jobs and deploy jobs depends on result from build jobs
+
+In that case we can use `needs:` attribute
+
+```yml
+name: Series Multiple Jobs
+on: push
+jobs: 
+    build_job_1:
+        name: Build State
+        runs-on: ubuntu-latest
+        steps:
+            - name: Install package
+              run: sudo apt install cowsay -y
+
+            - name: Generate build file
+              run: cowsay -f dragon "I am fooking dragon.. Let's burn them all" >> dragon.txt
+
+    test_job_2:
+        needs: build_job_1
+        name: Testing
+        runs-on: ubuntu-latest
+        steps: 
+            - name: Check if build exist
+              run: sudo grep -i "dragon" dragon.txt
+```
+
+
+
 ### Steps
- - Steps, individual task or actions that make up the jobs
- - Multiple steps run sequencly in job's runner environment
- - Command, action, scripts to automate specific task like test, build and deploy for CI/CD
+- Steps, individual task or actions that make up the jobs
+- Multiple steps run sequencly in job's runner environment
+- Command, action, scripts to automate specific task like test, build and deploy for CI/CD
 
 
 #### Actions
