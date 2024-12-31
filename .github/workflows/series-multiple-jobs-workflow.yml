@@ -1,28 +1,44 @@
 name: Series Multiple Jobs
 on: push
-jobs: 
-    build_job_1:
-        name: Build State
-        runs-on: ubuntu-latest
-        steps:
-            - name: Install package
-              run: sudo apt install cowsay -y
+jobs:
+  build_job_1:
+    name: Build State
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install package
+        run: sudo apt install cowsay -y
 
-            - name: Generate build file
-              run: cowsay -f dragon "I am fooking dragon.. Let's burn them all" >> dragon.txt
+      - name: Generate build file
+        run: cowsay -f dragon "I am fooking dragon.. Let's burn them all" >> dragon.txt
 
-    test_job_2:
-        needs: build_job_1
-        name: Testing
-        runs-on: ubuntu-latest
-        steps: 
-            - name: Check if build exist
-              run: sudo grep -i "dragon" dragon.txt
-    
-    deploy_job_3:
-        needs: test_job_2
-        name: Deployment
-        runs-on: ubuntu-latest
-        steps: 
-            - name: Running The Build
-              run: cat dragon.txt
+      - name: Uploading the artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dragon-artifact
+          path: dragon.txt
+
+  test_job_2:
+    needs: build_job_1
+    name: Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dragon-artifact
+
+      - name: Check if build exist
+        run: grep -i "dragon" dragon.txt
+
+  deploy_job_3:
+    needs: test_job_2
+    name: Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dragon-artifact
+
+      - name: Running The Build
+        run: cat dragon.txt
