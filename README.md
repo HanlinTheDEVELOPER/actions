@@ -81,7 +81,9 @@ Here's the time for `artifacts` to shine.
 > Artifacts are files or datas that generate during a job on its associated runner. They can be used to `share data between jobs` and `store build or test output`. Normally, artifacts will be deleted after the job compeled.
 
 So now we know the existance of `artifacts` to save your day. But how do we share them across jobs with respective runner. Don't worry. There is already a verified action for uploading artifacts from a job and downloading artifacts from others.
+
 ![Artifacts Action](/assets/artifact-actions.png)
+
 Let's use them in our workflow.
 
 ```yml
@@ -119,6 +121,8 @@ jobs:
    --!>
 ```
 
+Now if you push the code again, you will see all workflows are completed successfully.Now check into the run workflow's summary. you will see the build file in the artifacts section. You can download it and check the content or delete if you want.By default, artifacts are stored for 90 days. You can change it in the settings.
+
 ### Steps
 
 - Steps, individual task or actions that make up the jobs
@@ -127,7 +131,4 @@ jobs:
 
 #### Actions
 
-Actions are pre-built components that provide reusable capability to perform specific task for various repository and workflows. They can be created by you, developers from community and organization for reusability across the repository. There are a ton of pre-built actions from checkouting code to deploy to cloud server of your choice. You can browse for various actions in [GitHub Marketplace](https://github.com/marketplace?type=actions). There are two kind of actions. The one from verified creators like Github itself. Those actions can be used with confidence. The other kinds is those from other creators. If you want to use those actions,
-<span style="color: orange">
-it's adivce that before you start using it you have to check its source code throughly yourself if they handle repository as it should be.
-</span>
+Actions are pre-built components that provide reusable capability to perform specific task for various repository and workflows. They can be created by you, developers from community and organization for reusability across the repository. There are a ton of pre-built actions from checkouting code to deploy to cloud server of your choice. You can browse for various actions in [GitHub Marketplace](https://github.com/marketplace?type=actions). There are two kind of actions. The one from verified creators like Github itself. Those actions can be used with confidence. The other kinds is those from other creators. If you want to use those actions, **:warning: it's adivce that before you start using it you have to check its source code throughly yourself if they handle repository as it should be**
