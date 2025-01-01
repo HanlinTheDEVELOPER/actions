@@ -6,7 +6,7 @@ jobs:
         strategy: 
             matrix:
                 os: [ubuntu-latest,window-latest]
-                images: [hello-world, nginx]
+                images: [hello-world, alpine]
         runs-on: ${{matrix.os}}
         steps: 
             - name: Docker Info
