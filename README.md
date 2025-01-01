@@ -35,15 +35,31 @@ Events are the triggers that cause a workflow to run. They can be anything from 
 Events are defined in the `on` property of a workflow file. You can set to multiple events to trigger a workflow by defining them in an array. eg.`on: [push, pull_request,folk]`.
 For example, the following workflow will run when a push is made to the `main` branch:
 
+#### Activity types and filter patterns
+
+You can use activity types and filter patterns to refine the trigger when a workflow should run.
+
+Let's start with Activity types. Activity types are the types of events that can trigger a workflow. For example, a `pull_request` is an event to trigger the workflow. `pull_request` has many activity types. For example, `opened`, `review_request`,`synchronize`, `closed`, `reopened`, etc. By default, a workflow only runs when a pull_request event's activity type is `opened`, `synchronize`, or `reopened`. You can trigger a workflow for different activity types by using the `types` property.
+
+Now let's talk about filter patterns. Filter patterns allow you to refine the trigger by specifying additional conditions like `branches`,`tags` and `path`. Let me show you the example.
+
 **_Example_**
 
 ```yml
 name: Build and Deploy
 on:
-  push:
-    branches:
-      - main
-      - develop
+  pull_request: #event
+    types: #only pull request with these activity-types will trigger the workflow
+      - opened
+      - closed
+    branches: #filter-pattern
+      - main #only pull request to main branch will trigger the workflow
+  push: #event
+    branches: #filter-pattern
+      - main #only push to main branch will trigger the workflow
+    paths: #filter-pattern
+      - "api/**" #only push to api folder will trigger the workflow
+
 jobs: ...
 ```
 
@@ -184,4 +200,9 @@ jobs:
    -->
 ```
 
-Now if you push the code again, you will see all workflows are completed successfully.Now check into the run workflow's summary. you will see the build file in the artifacts section. You can download it and check the content or delete if you want.By default, artifacts are stored for 90 days. You can change it in the settings.
+Now if you push the code again, you will see all workflows are completed successfully.Now check into the run workflow's summary. you will see the build file in the artifacts section. You can download it and check the content or delete if you want.
+By default, artifacts are stored for 90 days. You can change it in the settings.
+
+### Env Variables and Secrets
+
+We can use env variables in our workflows.
