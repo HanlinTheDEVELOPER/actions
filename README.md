@@ -28,34 +28,59 @@ jobs:
   ...
 ```
 
+#### Events
+
+Events are the triggers that cause a workflow to run. They can be anything from a [push](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#push) to [a pull request](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#pull_request) and [manual triggering](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_dispatch) to [a cron schedule](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#schedule). You can find [the list of events in the GitHub Actions documentation](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#choosing-and-using-a-workflow-template).
+
+Events are defined in the `on` property of a workflow file. You can set to multiple events to trigger a workflow by defining them in an array. eg.`on: [push, pull_request,folk]`.
+For example, the following workflow will run when a push is made to the `main` branch:
+
+**_Example_**
+
+```yml
+name: Build and Deploy
+on:
+  push:
+    branches:
+      - main
+      - develop
+jobs: ...
+```
+
+#### Workflow templates
+
+For common workflows, you can use workflow templates. Workflow templates are pre-defined workflows that you can use in your repository.Github provide workflow templates for various language and tool. You can [learn more about using workflow templates in the GitHub Actions documentation](https://docs.github.com/en/actions/using-workflows/using-starter-workflows).
+
 ### Steps
 
 Before talking about jobs, we need to know about steps. So what are steps? Steps are individual tasks or actions that make up the jobs. They are defined in the `steps` list of a workflow file and are executed sequentially in the job's runner environment. Steps can be commands, actions, or scripts that automate specific tasks like testing, building, and deploying for CI/CD.
-
-- Steps, individual task or actions that make up the jobs
-- Multiple steps run sequentially in job's runner environment
-- Command, action, scripts to automate specific task like test, build and deploy for CI/CD
 
 **_Example_**
 
 ```yml
 steps:
-  - name: Install package
-    run: sudo apt install cowsay -y
+  - name: Run Tests
+    run: npm test
 
-  - name: Generate build file
-    run: cowsay -f dragon "I am fooking dragon.. Let's burn them all" >> dragon.txt
+  - name: Build Project
+    run: npm run build
 
-  - name: Check if build exist
-    run: sudo grep -i "dragon" dragon.txt
-
-  - name: Running The Build
-    run: cat dragon.txt
+  - name: Deploy
+    run: |
+      echo "Deploying application..."
 ```
 
 #### Actions
 
 Actions are pre-built components that provide reusable capability to perform specific task([Step](#steps)) to use in jobs for various repository and workflows. They can be created by you, developers from community and organization for reusability across the repository. There is a ton of pre-built actions from checkouting code to deploy to cloud server of your choice. You can browse for various actions in [GitHub Marketplace](https://github.com/marketplace?type=actions). There are two kind of actions. The one from verified creators like Github itself. Those actions can be used with confidence. The other kinds is those from other creators. If you want to use those actions, **_:warning: it's adivce that before you start using it you have to check its source code throughly yourself if they handle repository as it should be_**
+
+**_Example_**
+
+```yml
+steps:
+  - name: Checkout Code
+    uses: actions/checkout@v4
+```
 
 ### Jobs
 
@@ -101,12 +126,13 @@ jobs:
         run: cat dragon.txt
 ```
 
+Now go check the action tab in your Github repository.
+
 ![Series Jobs Fails](/assets/series-jobs-fails.png)
 
-As you can see in image jobs are run sequentially. If one of the preceding jobs fails, the subsequent jobs will automatically be skipped.
-Okay, we have a fail job to debug. Let's do it.
+As you can see in image, now jobs are run sequentially. If one of the preceding jobs fails, the subsequent jobs will automatically be skipped. Okay ninja, we have a fail job to debug. Let's do it.
 
-> Below is the log i found by clicking on the fail job
+Below is the log i found by clicking on the fail job
 
 ![Check Build File Exist Fails](/assets/check-build-exist-fail.png)
 
