@@ -1,0 +1,16 @@
+name: Using Matrix
+on: push
+
+jobs:
+    deploy:
+        strategy: 
+            matrix:
+                os: [ubuntu-latest,window-latest]
+                images: [hello-world, nginx]
+        runs-on: ${{matrix.os}}
+        steps: 
+            - name: Docker Info
+              run: docker info
+            
+            - name: Docker Run ${{matrix.images}}
+              run: docker run ${{matrix.images}}
