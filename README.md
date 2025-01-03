@@ -28,7 +28,11 @@ jobs:
   ...
 ```
 
-#### Events
+#### Workflow templates
+
+For common workflows, you can use workflow templates. Workflow templates are pre-defined workflows that you can use in your repository.Github provide workflow templates for various language and tool. You can [learn more about using workflow templates in the GitHub Actions documentation](https://docs.github.com/en/actions/using-workflows/using-starter-workflows).
+
+### Events
 
 Events are the triggers that cause a workflow to run. They can be anything from a [push](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#push) to [a pull request](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#pull_request) and [manual triggering](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_dispatch) to [a cron schedule](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#schedule). You can find [the list of events in the GitHub Actions documentation](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#choosing-and-using-a-workflow-template).
 
@@ -62,10 +66,6 @@ on:
 
 jobs: ...
 ```
-
-#### Workflow templates
-
-For common workflows, you can use workflow templates. Workflow templates are pre-defined workflows that you can use in your repository.Github provide workflow templates for various language and tool. You can [learn more about using workflow templates in the GitHub Actions documentation](https://docs.github.com/en/actions/using-workflows/using-starter-workflows).
 
 ### Steps
 
@@ -155,9 +155,9 @@ Below is the log i found by clicking on the fail job
 We clearly generate that file in build state, right? Then why does it saying `No such file or directory`. Remeber, it's said in above that `a job is associated with a runner`. What is a runner? It's a server or vm, right? So even if those three jobs are running one after another, they are still running on each machine.
 Here's the time for `artifacts` to shine.
 
-> #### What are Artifacts?
->
-> Artifacts are files or datas that generate during a job on its associated runner. They can be used to `share data between jobs` and `store build or test output`. Normally, artifacts will be deleted after the job compeled.
+#### What are Artifacts?
+
+Artifacts are files or datas that generate during a job on its associated runner. They can be used to `share data between jobs` and `store build or test output`. Normally, artifacts will be deleted after the job compeled.
 
 So now we know the existance of `artifacts` to save your day. But how do we share them across jobs with respective runner. Don't worry. There is already a verified action for uploading artifacts from a job and downloading artifacts from others.
 
@@ -202,6 +202,34 @@ jobs:
 
 Now if you push the code again, you will see all workflows are completed successfully.Now check into the run workflow's summary. you will see the build file in the artifacts section. You can download it and check the content or delete if you want.
 By default, artifacts are stored for 90 days. You can change it in the settings.
+
+#### Matrix Jobs
+
+You want to run the same job with different configurations like different runners, different versions of a package, different versions of a language, etc. You can use matrix jobs instead of creating multiple jobs for each configuration.
+
+```yml
+name: Matrix Jobs
+on: push
+
+jobs:
+  deploy:
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        os: [ubuntu-latest, windows-latest, u]
+        images: [hello-world, alpine]
+        exclude:
+          - images: alpine
+            os: windows-latest
+        include:
+          - images: amd64/alpine
+            os: ubuntu-latest
+    runs-on: ${{matrix.os}}
+    steps:
+      - name: Docker Run ${{matrix.images}}
+        run: docker run ${{matrix.images}}
+```
 
 ### Env Variables and Secrets
 
@@ -250,7 +278,7 @@ jobs:
         run: echo docker run docker.io/$USERNAME/$IMAGENAME:$TAG
 ```
 
-Okay, let's see this workflow in action. Beaware that i used `workflow_dispatch` trigger. So you will need to trigger it manually. And i only used `echo` command. Because why not?
+Okay, let's see this workflow in action. Beaware that i used `workflow_dispatch` trigger. So you will need to trigger it manually. I only use a simple trigger. If you want to know about **_mannully running workflow with inputs and stuff go check [here](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#workflow_dispatch)_** .And i only used `echo` command. Because why not?
 
 ![Env Variables](/assets/env-var.png)
 
@@ -273,3 +301,7 @@ Click on New repository secret. and create a new secret.To use the secret in the
    - name: Login to Docker Hub
      run: echo docker login -u ${{vars.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
 ```
+
+![Secrets](/assets/encrypted_pass.png)
+
+Now, password is encrypted and no one can see it anymore.
