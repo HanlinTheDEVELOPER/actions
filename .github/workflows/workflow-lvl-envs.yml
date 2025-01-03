@@ -18,7 +18,7 @@ jobs:
           IMAGENAME: "ST_name"
         run: echo docker build -t ${{env.IMAGENAME}}:${{env.TAG}} .
       - name: Login to Docker Hub
-        run: echo docker login -u $USERNAME -p $PASSWORD
+        run: echo docker login -u ${{vars.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
       - name: Push Image
         run: echo docker push docker.io/$USERNAME/$IMAGENAME:$TAG
       - name: Deploy Image

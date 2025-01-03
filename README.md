@@ -205,7 +205,9 @@ By default, artifacts are stored for 90 days. You can change it in the settings.
 
 ### Env Variables and Secrets
 
-Imagine when you are creating your workflow to build docker image, push it to docker hub, and deploy it to your server. You will need to pass the images name in multiple places. You can hardcode it but that's not a good practice. And we, humans, love to make mistakes. So we need to use env variables.
+Imagine when you are creating your workflow to build docker image, push it to docker hub, and deploy it to your server. You will need to pass the images name in multiple places. You can hardcode it but that's not a good practice. And we, humans, love to make mistakes and by retyping same words, the grow of our love will be multiply. So we need to use env variables.
+
+#### Env Variables
 
 In workflows, you can define env variables in multiple ways.
 
@@ -249,3 +251,25 @@ jobs:
 ```
 
 Okay, let's see this workflow in action. Beaware that i used `workflow_dispatch` trigger. So you will need to trigger it manually. And i only used `echo` command. Because why not?
+
+![Env Variables](/assets/env-var.png)
+
+As you can see, in Build Image step, the image name is `ST_name` because we defined `env` in that step level. In Push Image step, the image name is `JB_name` as the env variable is only defined in the job level. We will get error if it's actually pushing the image that doesn't exist. But we are just demostrating here, who care. Don't worry about the login step right now. We will talk about it below.
+
+#### Secrets
+
+Secrets are like env variables but they are more secure. They are stored in Github and can be accessed by the workflow. They are also encrypted and can be accessed by the workflow. They can be stored in the repository settings, repository environment or organization settings. They can be accessed by the workflow using the `secrets` context.
+
+Go to the repository settings, under Security, click on Secrets and Variables and choose Actions.
+
+![Secrets](/assets/settingsecret.png)
+
+Click on New repository secret. and create a new secret.To use the secret in the workflow, you can use the `secrets` context. Like in the below example, we are using the `DOCKER_PASSWORD` secret.
+
+> _Okay, do you guys remember i mentioned that variable can be defined in the repository settings? Well, you can see that variables i highlighted in the image above? You can click that and define it there. If you want to use it in the workflow, you can use the `vars` context following variable name._
+
+```yml
+   ...
+   - name: Login to Docker Hub
+     run: echo docker login -u ${{vars.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PASSWORD}}
+```
