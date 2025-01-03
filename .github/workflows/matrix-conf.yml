@@ -8,7 +8,7 @@ jobs:
       max-parallel: 3
       matrix:
         os: [ubuntu-latest, ubuntu-20.04, windows-latest]
-        images: [hello-world, whalesay]
+        images: [hello-world, docker/whalesay]
         # exclude:
         #   - images: alpine
         #     os: windows-latest
