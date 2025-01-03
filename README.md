@@ -217,19 +217,29 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        os: [ubuntu-latest, windows-latest, u]
+        os: [ubuntu-latest, ubuntu-20.04, windows-latest]
         images: [hello-world, alpine]
         exclude:
           - images: alpine
             os: windows-latest
         include:
-          - images: amd64/alpine
-            os: ubuntu-latest
+          - images: mcr.microsoft.com/windows/nanoserver:ltsc2022
+            os: windows-latest
     runs-on: ${{matrix.os}}
     steps:
       - name: Docker Run ${{matrix.images}}
         run: docker run ${{matrix.images}}
 ```
+
+Okayy, let's break it down.
+
+- `strategy` is a keyword that tells Github to run the job with different configurations.
+- `fail-fast` is a keyword that tells Github to fail the remaining jobs if one of them fails.
+- `max-parallel` is a keyword that tells Github to run the maximum jobs in parallel.
+- `matrix` is a keyword that tells Github to run the job with different configurations.
+- `os` and `images` are keys of your own choice for your respective configurations.
+
+Let's forget the exclude and include for a while and focus on the os and images. We have three os and two images. So we will have 6 combinations. But there might be a case where you don't want to run a combination. Like we can't run bash script on windows. So we can exclude it. In the example above, we have excluded windows-latest with alpine image and included windows-latest with window nano server image. Let see the results
 
 ### Env Variables and Secrets
 
