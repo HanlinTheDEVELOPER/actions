@@ -212,7 +212,13 @@ In workflows, you can define env variables in multiple ways.
 - In the workflow file itself
 - In the repository settings
 
-Let's take a look at the first one. We can define env variables in different scopes or levels. For example, we can define env variables for the whole workflow, for a job, or for a step. Variables defined in a higher scope will override variables defined in a lower scope. For example, variables defined in the workflow level will override variables defined in the job level. Variables can be defined using the `env` keyword. Let's see it in action.
+Let's take a look at the first one. We can define env variables in different scopes or levels. For example, we can define env variables for the whole workflow, for a job, or for a step. Variables defined in a higher scope will be override by variables defined in a lower scope. For example, variables defined in the workflow level will be override by variables defined in the job level. Variables can be defined using the `env` keyword.
+
+Let's see it in action.
+
+Wait! Before that, there are two ways to access env variables. The first one is using dollar sign in front of the variable name, like `$SOME_NAME`. The second one is using `${{env.VARIABLE_NAME}}` syntax. Here is some spoilers for you. The second one is called as `env` context. There are many [contexts](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/accessing-contextual-information-about-workflow-runs) in github actions you can use in your workflow. I will talk about them below or not.
+
+Okay, let's define env variables in the workflow file.
 
 ```yml
 name: Env Variables
@@ -234,10 +240,12 @@ jobs:
         env:
           IMAGENAME: "ST_name"
         run: echo docker build -t ${{env.IMAGENAME}}:${{env.TAG}} .
+      - name: Login to Docker Hub
+        run: echo docker login -u $USERNAME -p $PASSWORD
       - name: Push Image
         run: echo docker push docker.io/$USERNAME/$IMAGENAME:$TAG
       - name: Deploy Image
         run: echo docker run docker.io/$USERNAME/$IMAGENAME:$TAG
 ```
 
-Okay, let's see this workflow in action. Beaware that i used `workflow_dispatch` trigger. So you will need to trigger it manually.
+Okay, let's see this workflow in action. Beaware that i used `workflow_dispatch` trigger. So you will need to trigger it manually. And i only used `echo` command. Because why not?
