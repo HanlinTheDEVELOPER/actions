@@ -205,4 +205,39 @@ By default, artifacts are stored for 90 days. You can change it in the settings.
 
 ### Env Variables and Secrets
 
-We can use env variables in our workflows.
+Imagine when you are creating your workflow to build docker image, push it to docker hub, and deploy it to your server. You will need to pass the images name in multiple places. You can hardcode it but that's not a good practice. And we, humans, love to make mistakes. So we need to use env variables.
+
+In workflows, you can define env variables in multiple ways.
+
+- In the workflow file itself
+- In the repository settings
+
+Let's take a look at the first one. We can define env variables in different scopes or levels. For example, we can define env variables for the whole workflow, for a job, or for a step. Variables defined in a higher scope will override variables defined in a lower scope. For example, variables defined in the workflow level will override variables defined in the job level. Variables can be defined using the `env` keyword. Let's see it in action.
+
+```yml
+name: Env Variables
+on: workflow_dispatch
+env:
+  IMAGENAME: WF_name
+  TAG: latest
+  USERNAME: WF_user
+  PASSWORD: Strong_password
+
+jobs:
+  build_job_1:
+    name: Build Image
+    runs-on: ubuntu-latest
+    env:
+      IMAGENAME: "JB_name"
+    steps:
+      - name: Build Image
+        env:
+          IMAGENAME: "ST_name"
+        run: echo docker build -t ${{env.IMAGENAME}}:${{env.TAG}} .
+      - name: Push Image
+        run: echo docker push docker.io/$USERNAME/$IMAGENAME:$TAG
+      - name: Deploy Image
+        run: echo docker run docker.io/$USERNAME/$IMAGENAME:$TAG
+```
+
+Okay, let's see this workflow in action. Beaware that i used `workflow_dispatch` trigger. So you will need to trigger it manually.
