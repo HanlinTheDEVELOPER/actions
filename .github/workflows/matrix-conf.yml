@@ -1,4 +1,4 @@
-name: Using Matrix
+name: Matrix Jobs
 on: push
 
 jobs:
