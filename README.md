@@ -100,14 +100,28 @@ steps:
 
 ### Jobs
 
-- building blocks of workflows
-- a job is associated with a runner
-  - Linux, Mac or Window Server
-  - Github hosted or Self-hosted
-  - Use runs-on attr to specify runner config
-- can have one or more jobs in single workflow
-  - Jobs in a workflow run parallelly so it will fail in case one jobs depand on others
-    > e.g Test jobs and deploy jobs depends on result from build jobs
+Jobs are the building blocks of workflows. A workflow can have one or more jobs. Each job is an independent unit of work that can be executed in parallel or sequentially. Each job run on associated virtual server but here we call those `runner`.They can be Linux,Mac and Windows runner .There are two types of runner, GitHub-hosted runner managed GitHub and self-hosted runner managed and maintain outside of GitHub by yourself. Jobs are defined in the `jobs` list of a workflow file.
+
+**_Example_**
+
+```yml
+name: Example Workflow
+on: push
+
+jobs:
+  script-job:
+    name: Running Custom Script
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Script
+        run: |
+          chmod +x myScript.sh
+          ./myScript.sh
+
+      - name: Build Output
+        run: cat dragon.txt
+```
 
 In that case we can use `needs:` attribute
 
@@ -205,7 +219,7 @@ By default, artifacts are stored for 90 days. You can change it in the settings.
 
 #### Matrix Jobs
 
-You want to run the same job with different configurations like different runners, different versions of a package, different versions of a language, etc. You can use matrix jobs instead of creating multiple jobs for each configuration.
+You want to run the same job with different configurations like different runners, different versions of a package, different versions of a language, etc. You can use `matrix` jobs instead of creating multiple jobs for each configuration. These jobs will run in parallel.
 
 ```yml
 name: Matrix Jobs
@@ -234,12 +248,16 @@ jobs:
 Okayy, let's break it down.
 
 - `strategy` is a keyword that tells Github to run the job with different configurations.
-- `fail-fast` is a keyword that tells Github to fail the remaining jobs if one of them fails.
+- `fail-fast` is a keyword with default value `true` that tells Github to fail the remaining jobs if one of them fails.
 - `max-parallel` is a keyword that tells Github to run the maximum jobs in parallel.
 - `matrix` is a keyword that tells Github to run the job with different configurations.
 - `os` and `images` are keys of your own choice for your respective configurations.
 
 Let's forget the exclude and include for a while and focus on the os and images. We have three os and two images. So we will have 6 combinations. But there might be a case where you don't want to run a combination. Like we can't run bash script on windows. So we can exclude it. In the example above, we have excluded windows-latest with alpine image and included windows-latest with window nano server image. Let see the results
+
+![Matrix Jobs](/assets/matrix-jobs.png)
+
+You can see total of 6 jobs and windows-latest with alpine image is skipped and windows-latest with window nano server image is added.
 
 ### Env Variables and Secrets
 
@@ -296,13 +314,13 @@ As you can see, in Build Image step, the image name is `ST_name` because we defi
 
 #### Secrets
 
-Secrets are like env variables but they are more secure. They are stored in Github and can be accessed by the workflow. They are also encrypted and can be accessed by the workflow. They can be stored in the repository settings, repository environment or organization settings. They can be accessed by the workflow using the `secrets` context.
+As you can see in the red circle. If you use variable they can be seen by anyone. You are doomed if you exposed your secret keys like password, api key, etc. That's what `secrets` are for. Secrets are like env variables but they are more secure. They are stored in Github and can be accessed by the workflow. They are also encrypted and can be accessed by the workflow. They can be stored in the repository settings, repository environment or organization settings. They can be accessed by the workflow using the `secrets` context.
 
 Go to the repository settings, under Security, click on Secrets and Variables and choose Actions.
 
 ![Secrets](/assets/settingsecret.png)
 
-Click on New repository secret. and create a new secret.To use the secret in the workflow, you can use the `secrets` context. Like in the below example, we are using the `DOCKER_PASSWORD` secret.
+Click on New repository secret. and create a new secret. To use the secret in the workflow, you can use the `secrets` context. Like in the below example, we are using the `DOCKER_PASSWORD` secret.
 
 > _Okay, do you guys remember i mentioned that variable can be defined in the repository settings? Well, you can see that variables i highlighted in the image above? You can click that and define it there. If you want to use it in the workflow, you can use the `vars` context following variable name._
 
@@ -315,3 +333,42 @@ Click on New repository secret. and create a new secret.To use the secret in the
 ![Secrets](/assets/encrypted_pass.png)
 
 Now, password is encrypted and no one can see it anymore.
+
+### Context
+
+Contexts are like variables that are available in the workflow. They are used to access information about the workflow run, the repository, the job, and the step, the runner, etc. They are accessed using the `${{<context>}}` syntax. We have used some of the context like `secrets`,`vars` and `env`. There are many contexts available in Github Actions. You can find them [here](https://docs.github.com/en/actions/learn-github-actions/contexts).
+
+### Concurrency
+
+By default, Github Actions will run all the workflows, jobs, and steps in parallel. So if you are working on a project with multiple developers, it could lead to unexpected results. To prevent this, you can use the `concurrency` keyword. You can use concurrency in workflows level or job level.
+
+**_Example for workflows level:_**
+
+```yml
+name: Concurrency
+on: workflow_dispatch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+```
+
+**_Example for workflows level:_**
+
+```yml
+name: Concurrency
+on: workflow_dispatch
+jobs:
+  build_job_1:
+  name: Build Image
+  runs-on: ubuntu-latest
+  concurrency:
+    group: deploy_group
+    cancel-in-progress: true
+```
+
+We have to specify two keywords in concurrency. The first one is `group` and the second one is `cancel-in-progress`. The `group` keyword is used to specify the group name. Value of `group` can be any string(_!Note: they are case insensitive_) or expression. But for expression you can only use `github`,`inputs` and `vars`. The `cancel-in-progress` keyword is used to cancel the running workflow if another workflow with the same group name is triggered. If you don't want to cancel the current running workflow when a new workflow start, you can set it to `false`. You can learn more about `concurrency` [here](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/control-the-concurrency-of-workflows-and-jobs).
+
+### Goodbye!
+
+Now it's time to say goodbye as most of the fundamentals of Github Actions have been covered. There's one thing i left out. That's the expressions. You can learn about expressions [here](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/evaluate-expressions-in-workflows-and-actions). I hope you enjoyed this and learned something new. If you have any questions, go ask ChatGPT :kissing:. Just Kidding, feel free to ask me. I will be happy to help you. Thank you for reading. If you like this article, please share it with your friends and colleagues and subscribe to my [newsletter](https://hanlin.hashnode.dev/newsletter) to get notified about new articles.

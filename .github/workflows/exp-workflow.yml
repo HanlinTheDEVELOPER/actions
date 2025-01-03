@@ -1,0 +1,19 @@
+name: Example Workflow
+on: push
+
+jobs:
+  script-job:
+    name: Running Custom Script
+    runs-on: ubuntu-latest
+
+    steps:
+      # - name: Checkout Code
+      #   uses: actions/checkout@v4
+
+      - name: Run Script
+        run: |
+          chmod +x myScript.sh
+          ./myScript.sh
+
+      - name: Build Output
+        run: cat dragon.txt
