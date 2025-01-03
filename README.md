@@ -123,6 +123,23 @@ jobs:
         run: cat dragon.txt
 ```
 
+If you run this workflow, you will see the following output:
+
+![output](/assets/first-eg.png)
+
+As you can see, Run Script step fails and upcoming steps are skipped.The error indicates that no such file or directory exists in Run Script step. Why? Because initially runners don't have the file of our repository. So like we need to clone to our local machine from GitHub repo, we need to clone to our runner. Thankfully, GitHub Actions provides a pre-built action for that.
+Let's add that action to our workflow.
+
+```yml
+steps:
+  - name: Checkout Code
+    uses: actions/checkout@v4
+  - name: Run Script
+    ....
+```
+
+We add a new step for checking out the code before Run Script step. Now push it and let trigger the workflow. Now you should see the workflow run successfully.
+
 In that case we can use `needs:` attribute
 
 ```yml
