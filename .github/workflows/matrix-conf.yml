@@ -13,8 +13,8 @@ jobs:
           - images: alpine
             os: windows-latest
         include:
-          - images: amd64/alpine
-            os: ubuntu-latest
+          - images: mcr.microsoft.com/windows/nanoserver:ltsc2022
+            os: windows-latest
 
     runs-on: ${{matrix.os}}
     steps:
