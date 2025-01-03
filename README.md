@@ -140,7 +140,32 @@ steps:
 
 We add a new step for checking out the code before Run Script step. Now push it and let trigger the workflow. Now you should see the workflow run successfully.
 
-In that case we can use `needs:` attribute
+As mentioned above, jobs will be executed in parallel by default. Let's see an example for it.
+
+```yml
+name: Parallel Multiple Jobs
+on: push
+
+jobs:
+  build_job_1:
+    name: Build State
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install package
+        run: sudo apt install cowsay -y
+
+      - name: Generate build file
+        run: cowsay -f dragon "I am fooking dragon.. Let's burn them all" >> dragon.txt
+
+  test_job_2:
+    name: Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if build exist
+        run: sudo grep -i "dragon" dragon.txt
+```
+
+Sadly, above workflow will fail. If you look at the code, we generate a txt file in Build State job. And then we try to test it in Testing job. But the problem is, these two jobs are running in parallel. So the Testing job will run before Build State job is finished. In that case, we need to run these job sequentially. We can do that by using `needs` keyword. Let's do that.
 
 ```yml
 name: Series Multiple Jobs
@@ -177,7 +202,7 @@ Now go check the action tab in your Github repository.
 
 ![Series Jobs Fails](/assets/series-jobs-fails.png)
 
-As you can see in image, now jobs are run sequentially. If one of the preceding jobs fails, the subsequent jobs will automatically be skipped. Okay ninja, we have a fail job to debug. Let's do it.
+Opps, it still fails.Don't be :scream_cat:. At least, it run sequentially as we intended:relieved:. If one of the preceding jobs fails, the subsequent jobs will automatically be skipped. Okay ninja, we have a fail job to debug. Let's go.
 
 Below is the log i found by clicking on the fail job
 
